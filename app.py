@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import time
 from utils.data_loader import (
     load_sales_data, load_calendar_data, preprocess_sales_data, 
     simulate_milk_supply, get_available_stores_and_states,
@@ -8,6 +9,10 @@ from utils.data_loader import (
     load_prices_data, get_item_pricing_data, calculate_average_price_by_plant,
     simulate_production_costs
 )
+from utils.ml_data_loader import (
+    MLEnhancedDataLoader, get_ml_model_summary, get_advanced_analytics_summary
+)
+from utils.feature_engineering import create_comprehensive_features
 from utils.forecast import forecast_demand
 from utils.optimizer import (
     optimize_schedule, analyze_supply_demand_gaps, get_optimization_summary,
@@ -28,6 +33,15 @@ if 'forecast_df' not in st.session_state:
     st.session_state['forecast_df'] = None
 if 'supply_df' not in st.session_state:
     st.session_state['supply_df'] = None
+if 'ml_loader' not in st.session_state:
+    st.session_state['ml_loader'] = None
+if 'ml_insights' not in st.session_state:
+    st.session_state['ml_insights'] = None
+if 'pretrained_models_available' not in st.session_state:
+    # Check if pre-trained models exist
+    import os
+    pretrained_path = 'models/latest_trained_models.pkl'
+    st.session_state['pretrained_models_available'] = os.path.exists(pretrained_path)
 
 # Load data once and cache in session state
 if 'data_loaded' not in st.session_state:
@@ -42,7 +56,7 @@ st.sidebar.markdown("---")
 
 page = st.sidebar.selectbox(
     "Navigate to:",
-    ["🏠 Home - Demand Forecasting", "🚚 Supply Simulation", "🔄 Optimization & Analysis", "🏭 Multi-Plant Analysis", "💰 Cost & Profit Optimization", "📊 Dashboard & Reports"]
+    ["🏠 Home - Demand Forecasting", "🚚 Supply Simulation", "🔄 Optimization & Analysis", "🏭 Multi-Plant Analysis", "💰 Cost & Profit Optimization", "🤖 Advanced ML Analytics", "📊 Dashboard & Reports"]
 )
 
 st.sidebar.markdown("---")
@@ -1017,6 +1031,727 @@ elif page == "💰 Cost & Profit Optimization":
         "• **ROI Analysis:** Comprehensive return on investment calculations for business decision making\n"
         "• **Multi-Plant Comparison:** Compare profitability across different plants and regions\n"
         "• **Investment Guidance:** Data-driven recommendations for capacity expansion and operational improvements"
+    )
+
+# ADVANCED ML ANALYTICS PAGE
+elif page == "🤖 Advanced ML Analytics":
+    st.title("🤖 Advanced Machine Learning Analytics")
+    st.markdown("Leverage advanced ML models trained on M5 dataset for deeper business insights and predictive analytics.")
+    
+    # ML Overview
+    st.subheader("🧠 Available ML Models")
+    ml_summary = get_ml_model_summary()
+    
+    # Check for pre-trained models
+    if st.session_state['pretrained_models_available']:
+        st.success("✅ Pre-trained models detected! You can use them for instant analysis or train new ones.")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🚀 Load Pre-trained Models", type="primary"):
+                with st.spinner("Loading pre-trained models..."):
+                    if st.session_state['ml_loader'] is None:
+                        st.session_state['ml_loader'] = MLEnhancedDataLoader()
+                    
+                    success = st.session_state['ml_loader'].load_models('models/latest_trained_models.pkl')
+                    if success:
+                        st.session_state['ml_insights'] = st.session_state['ml_loader'].get_business_insights()
+                        st.success("✅ Pre-trained models loaded successfully!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Failed to load pre-trained models")
+        
+        with col2:
+            if st.button("🔄 Train New Models", type="secondary"):
+                st.session_state['ml_loader'] = None  # Reset to force new training
+                st.info("Scroll down to 'Full ML Model Training' section to train new models")
+    else:
+        st.info("💡 No pre-trained models found. You can train models interactively or run the pre-training script.")
+        st.code("python train_models.py --full_train", language="bash")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**🎯 Predictive Models:**")
+        for model_name, model_info in ml_summary['models'].items():
+            with st.expander(f"📈 {model_name.replace('_', ' ').title()}"):
+                st.write(f"**Purpose:** {model_info['purpose']}")
+                st.write(f"**Input:** {model_info['input']}")
+                st.write(f"**Output:** {model_info['output']}")
+                st.write(f"**Business Value:** {model_info['business_value']}")
+    
+        with col2:
+            st.markdown("**🔧 Feature Engineering:**")
+            for feature_type, description in ml_summary['features'].items():
+                st.write(f"• **{feature_type.replace('_', ' ').title()}:** {description}")
+    
+    st.markdown("---")
+    
+    # Model Status Display
+    st.subheader("📊 Model Status")
+    
+    if st.session_state['ml_loader'] and st.session_state['ml_loader'].is_trained:
+        st.success("✅ ML Models are loaded and ready!")
+        
+        # Display loaded model info
+        trained_models = st.session_state['ml_loader'].trained_models
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Models Loaded", len(trained_models))
+        with col2:
+            insights_count = len(st.session_state.get('ml_insights', {}))
+            st.metric("Insights Available", insights_count)
+        with col3:
+            st.metric("Status", "✅ Ready")
+        
+        # Quick insights preview
+        if st.session_state.get('ml_insights'):
+            with st.expander("🔍 Quick Insights Preview"):
+                insights = st.session_state['ml_insights']
+                
+                if 'feature_insights' in insights:
+                    feature_insights = insights['feature_insights']
+                    
+                    if 'seasonality' in feature_insights:
+                        seasonality = feature_insights['seasonality']
+                        st.write(f"**Peak Months:** {seasonality.get('peak_months', [])}")
+                        st.write(f"**Low Months:** {seasonality.get('low_months', [])}")
+                    
+                    if 'event_impact' in feature_insights:
+                        event_count = len(feature_insights['event_impact'])
+                        st.write(f"**Events Analyzed:** {event_count}")
+                
+                if 'recommendations' in insights:
+                    rec_count = len(insights['recommendations'])
+                    st.write(f"**Recommendations Generated:** {rec_count}")
+    else:
+        st.warning("⚠️ No ML models loaded. Choose an option above to get started.")
+    
+    st.markdown("---")    # ML Analysis Options
+    analysis_option = st.selectbox(
+        "Select ML Analysis Type:",
+        [
+            "Quick Analytics Summary", 
+            "Advanced Feature Analysis", 
+            "Full ML Model Training",
+            "Store Performance ML Analysis"
+        ]
+    )
+    
+    if analysis_option == "Quick Analytics Summary":
+        st.subheader("⚡ Quick ML Analytics Summary")
+        st.markdown("Get instant insights without training complex models.")
+        
+        if st.button("🚀 Generate Quick Analytics", type="primary"):
+            with st.spinner("Generating ML-powered analytics..."):
+                
+                # Get advanced analytics summary
+                analytics_summary = get_advanced_analytics_summary(
+                    st.session_state['sales_df'],
+                    st.session_state['calendar_df'],
+                    st.session_state.get('prices_df')
+                )
+                
+                # Display results
+                col1, col2, col3, col4 = st.columns(4)
+                
+                with col1:
+                    st.metric("ML Features Created", analytics_summary['feature_count'])
+                
+                with col2:
+                    anomaly_pct = analytics_summary.get('anomaly_percentage', 0)
+                    st.metric("Data Anomalies", f"{anomaly_pct:.1f}%")
+                
+                with col3:
+                    recommendations_count = len(analytics_summary.get('recommendations', []))
+                    st.metric("ML Recommendations", recommendations_count)
+                
+                with col4:
+                    insights_count = len(analytics_summary.get('insights', {}))
+                    st.metric("Business Insights", insights_count)
+                
+                # Display insights
+                st.markdown("---")
+                st.subheader("🔍 Key Business Insights")
+                
+                insights = analytics_summary.get('insights', {})
+                
+                if 'price_sensitivity' in insights:
+                    st.markdown("**💰 Price Sensitivity Analysis:**")
+                    price_data = insights['price_sensitivity']
+                    for feature, sensitivity in price_data.items():
+                        if abs(sensitivity) > 0.1:
+                            sensitivity_level = "High" if abs(sensitivity) > 0.3 else "Medium"
+                            direction = "Negative" if sensitivity < 0 else "Positive"
+                            st.write(f"• {feature}: {direction} correlation ({sensitivity:.2f}) - {sensitivity_level} sensitivity")
+                
+                if 'event_impact' in insights:
+                    st.markdown("**🎉 Event Impact Analysis:**")
+                    for event, impact_data in insights['event_impact'].items():
+                        impact_pct = impact_data.get('impact_percentage', 0)
+                        if abs(impact_pct) > 5:
+                            direction = "increases" if impact_pct > 0 else "decreases"
+                            st.write(f"• {event} {direction} demand by {abs(impact_pct):.1f}%")
+                
+                if 'seasonality' in insights:
+                    st.markdown("**📅 Seasonal Patterns:**")
+                    seasonality = insights['seasonality']
+                    st.write(f"• Peak months: {seasonality.get('peak_months', [])}")
+                    st.write(f"• Low months: {seasonality.get('low_months', [])}")
+                
+                # Display recommendations
+                st.markdown("---")
+                st.subheader("💡 ML-Generated Recommendations")
+                
+                recommendations = analytics_summary.get('recommendations', [])
+                for i, rec in enumerate(recommendations):
+                    priority_color = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(rec.get('priority', 'low'), "🔵")
+                    st.write(f"{priority_color} **{rec.get('type', 'General').title()}:** {rec.get('message', '')}")
+                    if 'action' in rec:
+                        st.write(f"   → *Action:* {rec['action']}")
+    
+    elif analysis_option == "Advanced Feature Analysis":
+        st.subheader("🔬 Advanced Feature Engineering Analysis")
+        st.markdown("Deep dive into feature creation and importance analysis.")
+        
+        # Store selection for detailed analysis
+        stores_states = get_available_stores_and_states(st.session_state['sales_df'])
+        selected_store = st.selectbox("Select Store for Detailed Analysis:", list(stores_states.keys())[:10])
+        
+        if st.button("🔍 Analyze Features", type="primary"):
+            with st.spinner("Creating and analyzing advanced features..."):
+                
+                # Filter data for selected store
+                store_sales = st.session_state['sales_df'][
+                    st.session_state['sales_df']['store_id'] == selected_store
+                ]
+                
+                if len(store_sales) == 0:
+                    st.error("No data found for selected store.")
+                    st.stop()
+                
+                # Create comprehensive features
+                feature_data = create_comprehensive_features(
+                    store_sales,
+                    st.session_state['calendar_df'],
+                    st.session_state.get('prices_df')
+                )
+                
+                # Display feature statistics
+                features_df = feature_data['features']
+                
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Total Features", len(features_df.columns))
+                with col2:
+                    st.metric("Data Points", len(features_df))
+                with col3:
+                    st.metric("Feature Density", f"{(features_df != 0).mean().mean():.1%}")
+                
+                # Feature categories
+                st.markdown("---")
+                st.subheader("📊 Feature Categories")
+                
+                feature_categories = {}
+                for col in features_df.columns:
+                    category = 'other'
+                    if 'time' in col or 'day' in col or 'month' in col or 'week' in col:
+                        category = 'time_features'
+                    elif 'lag' in col:
+                        category = 'lag_features'
+                    elif 'mean' in col or 'std' in col or 'min' in col or 'max' in col:
+                        category = 'rolling_features'
+                    elif 'price' in col:
+                        category = 'price_features'
+                    elif 'snap' in col or 'event' in col:
+                        category = 'event_features'
+                    elif 'sin' in col or 'cos' in col:
+                        category = 'cyclical_features'
+                    
+                    if category not in feature_categories:
+                        feature_categories[category] = 0
+                    feature_categories[category] += 1
+                
+                # Display feature category breakdown
+                category_df = pd.DataFrame(
+                    list(feature_categories.items()),
+                    columns=['Category', 'Count']
+                )
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.dataframe(category_df, height=200)
+                
+                with col2:
+                    # Simple bar chart of feature categories
+                    import matplotlib.pyplot as plt
+                    fig, ax = plt.subplots(figsize=(8, 6))
+                    ax.bar(category_df['Category'], category_df['Count'])
+                    ax.set_title('Feature Categories Distribution')
+                    ax.set_xlabel('Category')
+                    ax.set_ylabel('Count')
+                    plt.xticks(rotation=45)
+                    plt.tight_layout()
+                    st.pyplot(fig)
+                
+                # Feature correlation with target
+                st.markdown("---")
+                st.subheader("🎯 Feature Correlation with Sales")
+                
+                # Calculate correlation with original sales data
+                store_ts = preprocess_sales_data(store_sales, st.session_state['calendar_df'])
+                
+                if len(store_ts) == len(features_df):
+                    correlations = features_df.corrwith(store_ts['sales']).abs().sort_values(ascending=False)
+                    top_features = correlations.head(15)
+                    
+                    # Display top correlated features
+                    fig, ax = plt.subplots(figsize=(10, 8))
+                    top_features.plot(kind='barh', ax=ax)
+                    ax.set_title('Top 15 Features by Correlation with Sales')
+                    ax.set_xlabel('Absolute Correlation')
+                    plt.tight_layout()
+                    st.pyplot(fig)
+                    
+                    st.dataframe(
+                        pd.DataFrame({
+                            'Feature': top_features.index,
+                            'Correlation': top_features.values
+                        }).round(3),
+                        height=300
+                    )
+                
+                # Display insights and recommendations
+                st.markdown("---")
+                st.subheader("💡 Feature Analysis Insights")
+                
+                insights = feature_data['insights']
+                recommendations = feature_data['recommendations']
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown("**🔍 Key Insights:**")
+                    for insight_type, insight_data in insights.items():
+                        st.write(f"• **{insight_type.replace('_', ' ').title()}:**")
+                        if isinstance(insight_data, dict):
+                            for key, value in list(insight_data.items())[:3]:
+                                st.write(f"  - {key}: {value}")
+                
+                with col2:
+                    st.markdown("**🎯 Recommendations:**")
+                    for rec in recommendations[:5]:
+                        priority_color = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(rec.get('priority', 'low'), "🔵")
+                        st.write(f"{priority_color} {rec.get('message', '')}")
+    
+    elif analysis_option == "Full ML Model Training":
+        st.subheader("🎯 Complete ML Model Training with Progress Tracking")
+        st.markdown("Train all ML models for comprehensive predictive analytics with real-time progress monitoring.")
+        
+        # Training options
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.info("⚠️ **Interactive Training**")
+            st.write("• Real-time progress tracking")
+            st.write("• Estimated time: 5-8 minutes")
+            st.write("• Live feedback and ETA")
+            st.write("• Full feature engineering")
+        
+        with col2:
+            st.info("💡 **Pro Tip**: For command line training, use:")
+            st.code("python train_models.py", language="bash")
+            st.write("• Full training by default (~8 minutes)")
+            st.write("• Pre-saves models for instant loading")
+            st.write("• Add --quick_train for faster testing (~3 minutes)")
+        
+        # Get available stores
+        stores_states = get_available_stores_and_states(st.session_state['sales_df'])
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            train_store = st.selectbox("Select Store for Training:", ["All Stores"] + list(stores_states.keys())[:5])
+            train_item = st.selectbox("Select Item for Training:", ["All Items", "FOODS_3_090", "FOODS_3_091", "FOODS_3_092"])
+        
+        with col2:
+            st.markdown("**🤖 Models to be trained:**")
+            st.write("• 🎯 Demand Spike Classifier (RF)")
+            st.write("• 📈 XGBoost Volume Regressor")
+            st.write("• ⚡ LightGBM Volume Regressor")
+            st.write("• 🌲 Random Forest Regressor")
+            st.write("• 📅 Seasonality Analyzer")
+            st.markdown("**📊 Features:** 100+ engineered features")
+        
+        # Training button with enhanced warning
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            if st.button("🚀 Start Interactive ML Training", type="primary", use_container_width=True):
+                
+                # Enhanced training with progress tracking
+                training_start_time = time.time()
+                
+                # Create progress containers
+                progress_container = st.container()
+                with progress_container:
+                    st.markdown("### 🔄 Training Progress")
+                    
+                    # Main progress bar
+                    main_progress = st.progress(0)
+                    status_text = st.empty()
+                    timing_text = st.empty()
+                    
+                    # Step-by-step progress
+                    step_container = st.container()
+                
+                # Initialize ML loader
+                if st.session_state['ml_loader'] is None:
+                    st.session_state['ml_loader'] = MLEnhancedDataLoader()
+                
+                ml_loader = st.session_state['ml_loader']
+                
+                # Prepare training parameters
+                store_id = None if train_store == "All Stores" else train_store
+                item_id = None if train_item == "All Items" else train_item
+                
+                try:
+                    # Enhanced progress callback
+                    def streamlit_progress_callback(step_progress, message):
+                        elapsed = time.time() - training_start_time
+                        
+                        # Update main progress
+                        main_progress.progress(step_progress)
+                        status_text.text(f"🔄 {message}")
+                        
+                        # Calculate and display timing
+                        if step_progress > 0:
+                            total_estimated = elapsed / step_progress
+                            eta_seconds = total_estimated - elapsed
+                            eta = max(0, eta_seconds)
+                            timing_text.text(f"⏱️ Elapsed: {elapsed:.0f}s | ETA: {eta:.0f}s | Progress: {step_progress*100:.1f}%")
+                        else:
+                            timing_text.text(f"⏱️ Elapsed: {elapsed:.0f}s | Starting...")
+                        
+                        # Update step container
+                        with step_container:
+                            if step_progress < 0.2:
+                                st.text("📊 Step 1/6: Loading and preparing data...")
+                            elif step_progress < 0.35:
+                                st.text("🔧 Step 2/6: Creating 100+ advanced features...")
+                            elif step_progress < 0.6:
+                                st.text("🤖 Step 3/6: Training ML models (this takes the most time)...")
+                            elif step_progress < 0.8:
+                                st.text("🧠 Step 4/6: Generating ML insights...")
+                            elif step_progress < 0.95:
+                                st.text("💾 Step 5/6: Saving trained models...")
+                            else:
+                                st.text("✅ Step 6/6: Training completed!")
+                    
+                    # Start training with progress tracking
+                    status_text.text("🚀 Initializing ML training pipeline...")
+                    
+                    training_results = ml_loader.train_ml_models(
+                        store_id=store_id,
+                        item_id=item_id,
+                        save_models=True,
+                        use_streamlit=True  # Enable Streamlit progress tracking
+                    )
+                    
+                    # Final progress update
+                    main_progress.progress(1.0)
+                    status_text.text("🎉 Training completed successfully!")
+                    
+                    total_time = time.time() - training_start_time
+                    timing_text.text(f"✅ Total training time: {total_time:.0f} seconds ({total_time/60:.1f} minutes)")
+                    
+                    st.session_state['ml_insights'] = training_results['insights']
+                    
+                    # Success message with celebration
+                    st.balloons()
+                    st.success(f"🎉 ML models trained successfully in {total_time/60:.1f} minutes!")
+                    
+                    # Display training results
+                    st.markdown("---")
+                    st.subheader("📊 Training Results & Model Performance")
+                    
+                    # Performance metrics overview
+                    perf_col1, perf_col2, perf_col3, perf_col4 = st.columns(4)
+                    
+                    total_accuracy = 0
+                    total_r2 = 0
+                    model_count = 0
+                    accuracy_count = 0
+                    
+                    for model_name, results in training_results['training_results'].items():
+                        if 'accuracy' in results:
+                            total_accuracy += results['accuracy']
+                            accuracy_count += 1
+                        if 'test_r2' in results:
+                            total_r2 += results['test_r2']
+                            model_count += 1
+                    
+                    with perf_col1:
+                        if accuracy_count > 0:
+                            avg_accuracy = total_accuracy / accuracy_count
+                            st.metric("Avg Classification Accuracy", f"{avg_accuracy:.1%}")
+                        else:
+                            st.metric("Models Trained", len(training_results['training_results']))
+                    
+                    with perf_col2:
+                        if model_count > 0:
+                            avg_r2 = total_r2 / model_count
+                            st.metric("Avg Regression R²", f"{avg_r2:.3f}")
+                        else:
+                            st.metric("Feature Count", "100+")
+                    
+                    with perf_col3:
+                        training_time_min = total_time / 60
+                        st.metric("Training Time", f"{training_time_min:.1f} min")
+                    
+                    with perf_col4:
+                        insights_count = len(training_results.get('insights', {}))
+                        st.metric("Insights Generated", insights_count)
+                    
+                    # Detailed model results
+                    st.markdown("### 🔍 Detailed Model Performance")
+                    
+                    for model_name, results in training_results['training_results'].items():
+                        with st.expander(f"📈 {model_name.replace('_', ' ').title()} - Detailed Results"):
+                            
+                            result_col1, result_col2 = st.columns(2)
+                            
+                            with result_col1:
+                                if 'accuracy' in results:
+                                    accuracy = results['accuracy']
+                                    accuracy_color = "🟢" if accuracy > 0.8 else "🟡" if accuracy > 0.6 else "🔴"
+                                    st.metric("Classification Accuracy", f"{accuracy:.1%}", help=f"{accuracy_color} Quality indicator")
+                                
+                                if 'test_mae' in results:
+                                    st.metric("Test MAE (Lower is better)", f"{results['test_mae']:.2f}")
+                                
+                                if 'test_r2' in results:
+                                    r2 = results['test_r2']
+                                    r2_color = "🟢" if r2 > 0.8 else "🟡" if r2 > 0.6 else "🔴"
+                                    st.metric("Test R² Score", f"{r2:.3f}", help=f"{r2_color} Prediction quality")
+                            
+                            with result_col2:
+                                if 'feature_importance' in results and results['feature_importance'] is not None:
+                                    st.markdown("**🔝 Top 5 Important Features:**")
+                                    top_features = results['feature_importance'].head(5)
+                                    for idx, row in top_features.iterrows():
+                                        importance_pct = (row['importance'] / top_features['importance'].max()) * 100
+                                        bar_width = int(importance_pct / 5)  # Scale to 20 chars max
+                                        bar = "█" * bar_width + "░" * (20 - bar_width)
+                                        st.text(f"{row['feature'][:20]}: [{bar}] {row['importance']:.3f}")
+                    
+                    # Display ML insights
+                    st.markdown("---")
+                    st.subheader("🧠 AI-Generated Business Insights")
+                    
+                    insights = st.session_state['ml_insights']
+                    
+                    if 'demand_spikes' in insights:
+                        spike_data = insights['demand_spikes']
+                        
+                        st.markdown("#### 📈 Demand Prediction Insights")
+                        spike_col1, spike_col2, spike_col3 = st.columns(3)
+                        
+                        with spike_col1:
+                            spikes = spike_data.get('upcoming_spikes', 0)
+                            spike_color = "🔴" if spikes > 5 else "🟡" if spikes > 2 else "🟢"
+                            st.metric("Predicted Demand Spikes", f"{spike_color} {spikes}")
+                        
+                        with spike_col2:
+                            drops = spike_data.get('upcoming_drops', 0)
+                            drop_color = "🔴" if drops > 5 else "🟡" if drops > 2 else "🟢"
+                            st.metric("Predicted Demand Drops", f"{drop_color} {drops}")
+                        
+                        with spike_col3:
+                            total_predictions = spikes + drops
+                            st.metric("Total Anomalies Predicted", total_predictions)
+                    
+                    if 'feature_insights' in insights:
+                        feature_insights = insights['feature_insights']
+                        
+                        if 'event_impact' in feature_insights:
+                            st.markdown("#### 🎉 Event Impact Analysis")
+                            event_impacts = []
+                            for event, impact in feature_insights['event_impact'].items():
+                                impact_pct = impact.get('impact_percentage', 0)
+                                if abs(impact_pct) > 2:  # Only show significant impacts
+                                    direction = "📈" if impact_pct > 0 else "📉"
+                                    event_impacts.append({
+                                        'Event': event.replace('_', ' ').title(),
+                                        'Impact': f"{direction} {impact_pct:+.1f}%",
+                                        'Significance': "High" if abs(impact_pct) > 10 else "Medium" if abs(impact_pct) > 5 else "Low"
+                                    })
+                            
+                            if event_impacts:
+                                st.dataframe(pd.DataFrame(event_impacts), use_container_width=True)
+                    
+                    if 'recommendations' in insights:
+                        st.markdown("#### 💡 AI-Powered Business Recommendations")
+                        for i, rec in enumerate(insights['recommendations'][:5], 1):
+                            priority_colors = {"high": "🔴", "medium": "🟡", "low": "🟢"}
+                            priority_color = priority_colors.get(rec.get('priority', 'low'), "🔵")
+                            
+                            with st.expander(f"{priority_color} Recommendation {i}: {rec.get('type', 'General').title()}"):
+                                st.write(rec.get('message', ''))
+                                if 'impact' in rec:
+                                    st.info(f"💰 Expected Impact: {rec['impact']}")
+                                if 'timeline' in rec:
+                                    st.info(f"⏰ Timeline: {rec['timeline']}")
+                    
+                    # Save confirmation
+                    st.markdown("---")
+                    st.success("💾 **Models Automatically Saved!** You can now use these trained models for instant predictions.")
+                    st.info("🚀 **Next Steps:** Use other analysis options above to leverage your trained models for business insights!")
+                
+                except Exception as e:
+                    st.error(f"❌ Training failed: {str(e)}")
+                    st.write("**Troubleshooting tips:**")
+                    st.write("• Try selecting a specific store instead of 'All Stores'")
+                    st.write("• Ensure sufficient memory (4GB+ recommended)")
+                    st.write("• Check data quality and completeness")
+                    st.write("• Consider using the command-line training script for better performance")
+        
+        # Alternative training methods
+        st.markdown("---")
+        st.markdown("### 🛠️ Alternative Training Methods")
+        
+        alt_col1, alt_col2 = st.columns(2)
+        
+        alt_col1, alt_col2 = st.columns(2)
+        
+        with alt_col1:
+            st.markdown("#### ⚡ Quick Command-Line Training")
+            st.code("""
+# Full training - default (8-10 minutes)
+python train_models.py
+
+# Quick training for testing (3 minutes)  
+python train_models.py --quick_train
+            """, language="bash")
+            st.write("• Faster than interactive training")
+            st.write("• Progress bar in terminal")
+            st.write("• Models saved automatically")
+        
+        with alt_col2:
+            st.markdown("#### 🚀 Batch Training Scripts")
+            st.code("""
+# Windows
+train_models.bat
+
+# Linux/Mac
+./train_models.sh
+            """, language="bash")
+            st.write("• One-click training")
+            st.write("• No setup required")
+            st.write("• Pre-configured settings")
+    
+    elif analysis_option == "Store Performance ML Analysis":
+        st.subheader("🏪 Multi-Store ML Performance Analysis")
+        st.markdown("Compare ML-powered insights across multiple stores.")
+        
+        # Get available stores
+        stores_states = get_available_stores_and_states(st.session_state['sales_df'])
+        
+        # Store selection
+        available_stores = list(stores_states.keys())
+        selected_stores = st.multiselect(
+            "Select Stores for ML Analysis:",
+            available_stores,
+            default=available_stores[:3]
+        )
+        
+        if len(selected_stores) < 2:
+            st.warning("Please select at least 2 stores for comparison.")
+        else:
+            if st.button("🔍 Analyze Stores with ML", type="primary"):
+                with st.spinner(f"Analyzing {len(selected_stores)} stores with ML..."):
+                    
+                    # Initialize ML loader
+                    if st.session_state['ml_loader'] is None:
+                        st.session_state['ml_loader'] = MLEnhancedDataLoader()
+                    
+                    ml_loader = st.session_state['ml_loader']
+                    
+                    # Analyze stores
+                    store_analysis = ml_loader.analyze_store_performance(selected_stores)
+                    
+                    # Display results
+                    st.markdown("---")
+                    st.subheader("📊 Store Performance Comparison")
+                    
+                    # Create comparison metrics
+                    comparison_data = []
+                    for store_id, analysis in store_analysis.items():
+                        data_quality = analysis['data_quality']
+                        insights = analysis['insights']
+                        
+                        comparison_data.append({
+                            'Store_ID': store_id,
+                            'Total_Records': data_quality['total_records'],
+                            'Avg_Daily_Sales': data_quality['avg_daily_sales'],
+                            'Sales_Volatility': data_quality['sales_volatility'],
+                            'Recommendations': len(analysis['recommendations']),
+                            'Anomaly_Rate': analysis['anomalies'].get('statistical_outliers', {}).get('percentage', 0)
+                        })
+                    
+                    comparison_df = pd.DataFrame(comparison_data)
+                    st.dataframe(comparison_df.round(2), height=200)
+                    
+                    # Individual store insights
+                    for store_id, analysis in store_analysis.items():
+                        with st.expander(f"🏪 Store {store_id} - Detailed ML Analysis"):
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                st.markdown("**📈 Performance Metrics:**")
+                                data_quality = analysis['data_quality']
+                                st.write(f"• Records: {data_quality['total_records']:,}")
+                                st.write(f"• Avg Daily Sales: {data_quality['avg_daily_sales']:.1f}")
+                                st.write(f"• Volatility: {data_quality['sales_volatility']:.1f}")
+                                st.write(f"• Date Range: {data_quality['date_range']}")
+                            
+                            with col2:
+                                st.markdown("**🔍 ML Insights:**")
+                                insights = analysis['insights']
+                                
+                                if 'seasonality' in insights:
+                                    seasonality = insights['seasonality']
+                                    st.write(f"• Peak Months: {seasonality.get('peak_months', [])}")
+                                    st.write(f"• Low Months: {seasonality.get('low_months', [])}")
+                                
+                                if 'day_of_week_patterns' in insights:
+                                    dow_patterns = insights['day_of_week_patterns']
+                                    best_day = dow_patterns.get('best_day', 'N/A')
+                                    worst_day = dow_patterns.get('worst_day', 'N/A')
+                                    st.write(f"• Best Day: {best_day}")
+                                    st.write(f"• Worst Day: {worst_day}")
+                            
+                            # Recommendations
+                            st.markdown("**💡 Store-Specific Recommendations:**")
+                            for rec in analysis['recommendations'][:3]:
+                                priority_color = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(rec.get('priority', 'low'), "🔵")
+                                st.write(f"{priority_color} {rec.get('message', '')}")
+    
+    # ML Information Section
+    st.markdown("---")
+    st.subheader("ℹ️ Advanced ML Analytics Information")
+    st.info(
+        "**ML Analytics Capabilities:**\n\n"
+        "• **Demand Spike Prediction:** Classify upcoming demand spikes/drops using Random Forest\n"
+        "• **Volume Regression:** Predict exact demand quantities using XGBoost, LightGBM, Random Forest\n"
+        "• **Feature Engineering:** Create 100+ advanced features from time series, pricing, and event data\n"
+        "• **Seasonality Analysis:** Decompose complex seasonal patterns using Prophet\n"
+        "• **Business Insights:** Extract actionable insights from ML models\n"
+        "• **Anomaly Detection:** Identify unusual demand patterns and data quality issues\n"
+        "• **Cross-Store Analysis:** Compare ML insights across multiple store locations"
     )
 
 # DASHBOARD & REPORTS PAGE
