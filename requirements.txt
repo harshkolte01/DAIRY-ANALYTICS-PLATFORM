@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+prophet
+pulp
+matplotlib
+seaborn
+ortools
