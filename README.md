@@ -54,22 +54,26 @@ Project2/
 ├── app.py                    # Main Streamlit application with ML integration
 ├── train_models.py          # 🤖 Command-line ML training with progress tracking
 ├── requirements.txt         # Python dependencies (updated for ML)
-├── data/                    # M5 Competition Dataset
-│   ├── sales_train_validation.csv
-│   ├── calendar.csv
-│   ├── sell_prices.csv      # 💰 Pricing data for profit optimization
-│   └── sample_submission.csv
-├── models/                  # 🤖 Trained ML models directory
+├── README.md               # Comprehensive documentation
+├── report.txt              # Detailed technical report
+├── data/                   # M5 Competition Dataset
+│   ├── sales_train_validation.csv  # Historical sales data (30,490 records)
+│   ├── sales_train_evaluation.csv  # Extended sales data (30,490 records)
+│   ├── calendar.csv        # Date mapping and events (1,969 days)
+│   ├── sell_prices.csv     # 💰 Pricing data (6.8M records)
+│   └── sample_submission.csv # Submission format example
+├── models/                 # 🤖 Trained ML models directory
 │   ├── latest_trained_models.pkl
 │   └── ml_models_[timestamp].pkl
-└── utils/                   # Core modules (ML-enhanced)
-    ├── data_loader.py       # Data processing & pricing integration
-    ├── ml_data_loader.py    # 🤖 ML training orchestration with progress tracking
-    ├── ml_models.py         # 🤖 5 specialized ML models with insights generation
+└── utils/                  # Core modules (ML-enhanced)
+    ├── __init__.py        # Package initialization
+    ├── data_loader.py     # Data processing & pricing integration
+    ├── ml_data_loader.py  # 🤖 ML training orchestration with progress tracking
+    ├── ml_models.py       # 🤖 5 specialized ML models with insights generation
     ├── feature_engineering.py # 🤖 100+ feature engineering pipeline
-    ├── forecast.py          # Prophet demand forecasting
-    ├── optimizer.py         # Linear programming & profit optimization
-    └── plot.py             # Advanced visualization functions
+    ├── forecast.py        # Prophet demand forecasting
+    ├── optimizer.py       # Linear programming & profit optimization (PuLP)
+    └── plot.py           # Advanced visualization functions
 ```
 
 ## 🚀 Quick Start
@@ -100,8 +104,10 @@ streamlit run app.py
 ### Data Setup
 Ensure M5 competition data files are in the `data/` directory:
 - `sales_train_validation.csv` - Historical sales data (30,490 records)
+- `sales_train_evaluation.csv` - Extended sales data (30,490 records) 
 - `calendar.csv` - Date mapping and events (1,969 days)
 - `sell_prices.csv` - Pricing data for profit calculations (6.8M records)
+- `sample_submission.csv` - Example submission format (60,980 records)
 
 ## 🎯 Navigation Guide
 
@@ -149,21 +155,21 @@ Ensure M5 competition data files are in the `data/` directory:
 ### ML Training Pipeline
 ```python
 # 1. Data Loading & Verification
-sales_df = load_sales_data()          # 30,490 records
-calendar_df = load_calendar_data()    # 1,969 days
-prices_df = load_prices_data()        # 6.8M price records
+sales_df = load_sales_data()          # 30,490 records (validation + evaluation)
+calendar_df = load_calendar_data()    # 1,969 days of calendar data
+prices_df = load_prices_data()        # 6.8M price records across stores/items
 
 # 2. Feature Engineering (100+ features)
 features = create_comprehensive_features(sales_df, calendar_df, prices_df)
 # Creates: time features, lags, rolling stats, price dynamics, events, interactions
 
-# 3. ML Model Training
+# 3. ML Model Training (5 specialized models)
 models = {
-    'spike_classifier': DemandSpikeClassifier(),      # 100% accuracy
-    'volume_regressor_xgb': XGBoostRegressor(),       # R² = 0.959
-    'volume_regressor_lgb': LightGBMRegressor(),      # R² = 0.950
-    'volume_regressor_rf': RandomForestRegressor(),   # R² = 0.938
-    'seasonality_analyzer': SeasonalityAnalyzer()     # Prophet-based
+    'spike_classifier': DemandSpikeClassifier(),      # Random Forest, 100% accuracy
+    'volume_regressor_xgboost': XGBoostRegressor(),   # R² = 0.959
+    'volume_regressor_lightgbm': LightGBMRegressor(), # R² = 0.950
+    'volume_regressor_random_forest': RandomForestRegressor(), # R² = 0.938
+    'seasonality_analyzer': SeasonalityAnalyzer()     # Prophet-based analysis
 }
 
 # 4. Model Evaluation & Insights
@@ -279,6 +285,9 @@ scikit-learn>=1.1.0    # ML algorithms and metrics
 xgboost>=1.6.0         # Gradient boosting
 lightgbm>=3.3.0        # Fast gradient boosting
 prophet>=1.1.0         # Time series forecasting
+
+# Optimization
+pulp>=2.6.0            # Linear programming optimization
 
 # Visualization
 matplotlib>=3.5.0      # Plotting

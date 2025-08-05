@@ -1,0 +1,127 @@
+================================================================================
+                    DEMAND FORECASTING DASHBOARD - PAGE EXPLANATION
+================================================================================
+
+🏠 HOME PAGE: DEMAND FORECASTING
+================================================================================
+
+WHY IS THIS PAGE HERE?
+-------------------------
+This is the main landing page of our Dairy Analytics Platform. It's like the 
+"control center" where you can see what's happening with milk demand and predict
+what will happen in the future. Every dairy business needs to know how much milk
+customers will want so they can plan their production properly.
+
+WHAT IS THE PURPOSE?
+--------------------
+The main purpose is to:
+1. Show historical demand patterns - "What happened in the past?"
+2. Predict future demand - "What will happen next?"
+3. Identify unusual patterns - "Is something different happening?"
+4. Help plan production - "How much milk should we produce?"
+
+WHY WE ARE DOING THIS?
+----------------------
+Imagine you run a dairy farm. You need to know:
+- How much milk will customers buy next week?
+- Are there seasonal patterns (like more milk sold during school months)?
+- Will there be sudden spikes in demand during holidays?
+- How much raw milk should you process?
+
+Without this information, you might:
+❌ Produce too much milk → Waste and losses
+❌ Produce too little milk → Lost sales and unhappy customers
+❌ Miss seasonal trends → Poor planning
+
+With demand forecasting, you can:
+✅ Plan production accurately
+✅ Reduce waste
+✅ Increase profits
+✅ Keep customers happy
+
+HOW WE ARE DOING THIS?
+----------------------
+We use three powerful methods:
+
+1. **STATISTICAL ANALYSIS**
+   - Look at past sales data (30,490 records from real dairy sales)
+   - Calculate averages, trends, and patterns
+   - Identify seasonal effects (summer vs winter demand)
+
+2. **PROPHET FORECASTING MODEL**
+   - Advanced Facebook Prophet algorithm
+   - Automatically finds yearly, monthly, and weekly patterns
+   - Accounts for holidays and special events
+   - Creates confidence intervals (best case, worst case scenarios)
+
+3. **VISUAL CHARTS**
+   - Easy-to-read graphs showing past and future demand
+   - Color-coded patterns for easy understanding
+   - Interactive charts you can zoom and explore
+
+HOW WILL IT HELP?
+-----------------
+This dashboard helps in multiple ways:
+
+**For Production Planning:**
+- Know exactly how much to produce each day
+- Plan staff schedules based on expected demand
+- Optimize equipment usage
+
+**For Inventory Management:**
+- Avoid overstock and spoilage
+- Ensure enough supply during high-demand periods
+- Better storage planning
+
+**For Business Strategy:**
+- Identify growth opportunities
+- Plan promotional campaigns during low-demand periods
+- Make data-driven decisions instead of guessing
+
+**For Cost Management:**
+- Reduce waste by producing the right amount
+- Lower storage costs
+- Better cash flow management
+
+WHAT IS USED IN THIS PAGE?
+--------------------------
+**Data Sources:**
+- Historical sales data (2+ years of real dairy sales)
+- Calendar information (holidays, events, seasonality)
+- Weather patterns and external factors
+
+**Technology:**
+- Prophet forecasting algorithm (used by Facebook)
+- Statistical analysis tools
+- Interactive visualization library (Plotly)
+- Real-time data processing
+
+**Key Features:**
+- Time series analysis and forecasting
+- Seasonal decomposition
+- Trend analysis
+- Anomaly detection
+- Confidence intervals for predictions
+- Interactive charts and graphs
+
+**User Interface:**
+- Simple dropdown menus to select options
+- Real-time updates as you change settings
+- Export capabilities for reports
+- Mobile-friendly responsive design
+
+REAL-WORLD EXAMPLE:
+-------------------
+Let's say it's Monday, and you want to plan for next week:
+
+1. **Historical View**: See that last Tuesday had 15% higher sales than normal
+2. **Seasonal Pattern**: Notice that this month typically has 20% higher demand
+3. **Event Impact**: See that next Friday is a holiday, expect 30% spike
+4. **Forecast**: System predicts you'll need 1,200 liters on Friday vs normal 900
+
+Result: You plan production accordingly and avoid running out of stock!
+
+================================================================================
+This dashboard is your crystal ball for dairy demand - helping you see into the
+future and make smart business decisions based on data, not guesswork!
+================================================================================
