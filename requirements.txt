@@ -10,3 +10,4 @@ xgboost>=1.6.0
 lightgbm>=3.3.0
 scipy>=1.9.0
 plotly>=5.0.0
+requests>=2.28.0

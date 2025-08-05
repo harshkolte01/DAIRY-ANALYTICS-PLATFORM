@@ -1,0 +1,44 @@
+# Large data files - downloaded automatically from Dropbox
+data/*.csv
+models/*.pkl
+
+# But keep the directory structure
+!data/.gitkeep
+!models/.gitkeep
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.env
+
+# IDE files
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pytest
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Streamlit
+.streamlit/
+
+# Logs
+*.log

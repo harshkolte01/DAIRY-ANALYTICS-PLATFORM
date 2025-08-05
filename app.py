@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import time
+import os
+from utils.data_downloader import download_data_if_needed
 from utils.data_loader import (
     load_sales_data, load_calendar_data, preprocess_sales_data, 
     simulate_milk_supply, get_available_stores_and_states,
@@ -27,6 +29,10 @@ from utils.plot import (
 )
 
 st.set_page_config(page_title="Dairy Analytics Platform", layout="wide", initial_sidebar_state="expanded")
+
+# Check and setup data if needed - this will download from Dropbox if files are missing
+if not download_data_if_needed():
+    st.stop()
 
 # Initialize session state
 if 'forecast_df' not in st.session_state:

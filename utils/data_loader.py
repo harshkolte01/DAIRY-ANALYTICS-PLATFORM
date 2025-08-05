@@ -1,17 +1,30 @@
 import pandas as pd
 import numpy as np
 import os
+import streamlit as st
 
 def load_sales_data():
     path = "data/sales_train_validation.csv"
+    if not os.path.exists(path):
+        st.error(f"❌ Sales data file not found: {path}")
+        st.info("The data downloader should have handled this. Please refresh the page.")
+        return pd.DataFrame()
     return pd.read_csv(path)
 
 def load_calendar_data():
-    return pd.read_csv("data/calendar.csv")
+    path = "data/calendar.csv"
+    if not os.path.exists(path):
+        st.error(f"❌ Calendar data file not found: {path}")
+        return pd.DataFrame()
+    return pd.read_csv(path)
 
 def load_prices_data():
     """Load selling prices data"""
-    return pd.read_csv("data/sell_prices.csv")
+    path = "data/sell_prices.csv"
+    if not os.path.exists(path):
+        st.error(f"❌ Prices data file not found: {path}")
+        return pd.DataFrame()
+    return pd.read_csv(path)
 
 def get_item_pricing_data(prices_df, calendar_df, item_id, store_id=None):
     """
