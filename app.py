@@ -28,7 +28,41 @@ from utils.plot import (
     plot_demand_comparison_by_plant, plot_profit_analysis, plot_profit_trends
 )
 
-st.set_page_config(page_title="Dairy Analytics Platform", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Demand Forecasting Dashboard - Academic Project", layout="wide", initial_sidebar_state="expanded")
+
+# ACADEMIC PROJECT DISCLAIMER - PROMINENT DISPLAY
+st.markdown("""
+<div style="
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+">
+    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+        <span style="font-size: 24px; margin-right: 10px;">🎓</span>
+        <h2 style="color: white; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600;">
+            ACADEMIC PROJECT NOTICE
+        </h2>
+    </div>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6;">
+        <p style="margin-bottom: 12px; font-size: 16px;">
+            <strong style="color: #ffd700;">📚 Educational Purpose:</strong>
+            This dashboard demonstrates advanced forecasting methodologies using the industry-standard M5 Competition dataset (2011-2016).
+        </p>
+        <p style="margin-bottom: 12px; font-size: 16px;">
+            <strong style="color: #ffd700;">📊 Data Context:</strong>
+            Historical retail data serves as a benchmark for algorithm validation and methodology demonstration.
+        </p>
+        <p style="margin-bottom: 0; font-size: 16px;">
+            <strong style="color: #ffd700;">🎯 Focus:</strong>
+            Showcasing technical excellence in machine learning, feature engineering, and optimization techniques applicable to modern business scenarios.
+        </p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # Check and setup data if needed - this will download from Dropbox if files are missing
 if not download_data_if_needed():
@@ -57,8 +91,30 @@ if 'data_loaded' not in st.session_state:
     st.session_state['data_loaded'] = True
 
 # Sidebar Navigation
-st.sidebar.title("🥛 Dairy Analytics Platform")
+st.sidebar.title("🥛 Demand Forecasting Dashboard")
+st.sidebar.markdown("**Academic Methodology Demonstration**")
 st.sidebar.markdown("---")
+
+# Data Context Sidebar
+st.sidebar.markdown("### 📊 Dataset Information")
+st.sidebar.markdown("""
+<div style="
+    background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+">
+    <strong style="color: #ffd700;">M5 Competition Dataset (2011-2016)</strong><br><br>
+    • Industry-standard forecasting benchmark<br>
+    • 30,490+ product-store combinations<br>
+    • 7+ million data points<br>
+    • Used by major retailers & researchers
+</div>
+""", unsafe_allow_html=True)
 
 page = st.sidebar.selectbox(
     "Navigate to:",
@@ -66,16 +122,80 @@ page = st.sidebar.selectbox(
 )
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### About")
-st.sidebar.info(
-    "This platform helps optimize dairy operations by combining demand forecasting, "
-    "supply simulation, and production optimization with real-world constraints."
-)
+st.sidebar.markdown("### 🎯 Project Purpose")
+st.sidebar.markdown("""
+<div style="
+    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+">
+    <strong style="color: #ffd700;">Academic Demonstration of:</strong><br><br>
+    • Advanced forecasting methodologies<br>
+    • Machine learning techniques<br>
+    • Optimization algorithms<br>
+    • Business intelligence systems<br><br>
+    <em style="color: #fff3cd;">Techniques shown are industry-current and scalable to modern data.</em>
+</div>
+""", unsafe_allow_html=True)
 
 # HOME PAGE - DEMAND FORECASTING
 if page == "🏠 Home - Demand Forecasting":
     st.title("🏠 Demand Forecasting Dashboard")
-    st.markdown("Welcome to the Dairy Analytics Platform! Start by generating demand forecasts based on historical sales data.")
+    st.markdown("**A Comprehensive Forecasting Methodology Using M5 Competition Dataset**")
+    
+    # Methodology Context
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    ">
+        <h3 style="color: white; margin-top: 0; display: flex; align-items: center;">
+            <span style="margin-right: 10px;">🎯</span>
+            Academic Project Overview
+        </h3>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+            This dashboard demonstrates <strong>advanced forecasting methodologies</strong> using the industry-standard M5 Competition dataset.
+            While the data is historical (2011-2016), the <strong>techniques are current</strong> and widely used in industry today.
+        </p>
+        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <h4 style="color: #ffd700; margin-top: 0; margin-bottom: 10px;">🎓 Key Learning Objectives:</h4>
+            <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                <li>Master Prophet forecasting algorithm (used by Facebook)</li>
+                <li>Implement feature engineering and ML pipelines</li>
+                <li>Demonstrate production-ready optimization techniques</li>
+                <li>Show scalable architecture for real-world deployment</li>
+            </ul>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Data Age Context
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border-left: 4px solid #ffd700;
+    ">
+        <p style="margin: 0; font-size: 16px; display: flex; align-items: center;">
+            <span style="font-size: 20px; margin-right: 10px;">📅</span>
+            <strong>Data Context:</strong> This project uses M5 Competition data (2011-2016) for educational purposes.
+            The forecasting methodologies demonstrated are current and can be applied to modern datasets.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Data Overview
     col1, col2, col3 = st.columns(3)
@@ -1042,7 +1162,29 @@ elif page == "💰 Cost & Profit Optimization":
 # ADVANCED ML ANALYTICS PAGE
 elif page == "🤖 Advanced ML Analytics":
     st.title("🤖 Advanced Machine Learning Analytics")
-    st.markdown("Leverage advanced ML models trained on M5 dataset for deeper business insights and predictive analytics.")
+    st.markdown("**Methodology Demonstration: Advanced ML Techniques Using Industry-Standard Dataset**")
+    
+    # Academic Context for ML Section
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border-left: 4px solid #ffd700;
+    ">
+        <p style="margin: 0; font-size: 16px; line-height: 1.6; display: flex; align-items: flex-start;">
+            <span style="font-size: 24px; margin-right: 12px; margin-top: -2px;">🎓</span>
+            <span>
+                <strong style="color: #ffd700;">Academic Focus:</strong> This section demonstrates advanced machine learning methodologies including
+                ensemble methods, feature engineering, and automated insights generation. The techniques shown are
+                currently used by major tech companies (Meta, Amazon, Netflix) for production forecasting systems.
+            </span>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # ML Overview
     st.subheader("🧠 Available ML Models")
@@ -1763,7 +1905,33 @@ train_models.bat
 # DASHBOARD & REPORTS PAGE
 elif page == "📊 Dashboard & Reports":
     st.title("📊 Executive Dashboard & Reports")
-    st.markdown("Comprehensive overview of all analytics and key performance indicators.")
+    st.markdown("**Academic Project: Comprehensive Analytics Methodology Demonstration**")
+    
+    # Executive Summary Context
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    ">
+        <h3 style="color: white; margin-top: 0; display: flex; align-items: center;">
+            <span style="margin-right: 10px;">🎯</span>
+            Dashboard Purpose
+        </h3>
+        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+            This executive dashboard demonstrates <strong>business intelligence integration</strong> with machine learning predictions.
+            The KPIs and metrics shown represent industry-standard approaches to performance monitoring and strategic decision-making.
+        </p>
+        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-top: 15px;">
+            <p style="margin: 0; color: #ffd700;">
+                <strong>📚 Educational Value:</strong> Shows how technical ML models translate into actionable business insights.
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     if st.session_state['forecast_df'] is None:
         st.warning("⚠️ Please complete the analysis from previous pages first.")
